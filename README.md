@@ -1,1 +1,0 @@
-# CoreSQLite3
