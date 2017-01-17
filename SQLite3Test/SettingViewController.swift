@@ -66,7 +66,7 @@ class SettingViewController: UIViewController {
         }
     }
     private func saveSql(_model:UserModel){
-        if UserViewModel.insertOrUpdateTable(model!) {
+        if UserViewModel.insertOrUpdateTable(_model) {
             _ = self.navigationController?.popViewController(animated: true)
         }else {
             let alert = UIAlertController.init(title: "", message: "保存失败", preferredStyle: .alert)
