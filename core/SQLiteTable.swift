@@ -246,7 +246,7 @@ class SQLiteTable: NSObject {
                     }else if let val = params[index-1] as? Double {
                         result = sqlite3_bind_double(stmt, CInt(index), CDouble(val))
                     } else if let val = params[index-1] as? Int {
-                        result = sqlite3_bind_int(stmt, CInt(index), CInt(val))
+                        result = sqlite3_bind_int64(stmt, index, Int64(val))
                     } else {
                         result = sqlite3_bind_null(stmt, CInt(index))
                     }
