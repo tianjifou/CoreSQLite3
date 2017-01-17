@@ -24,9 +24,9 @@ class ViewController: UIViewController {
         reloadSqlData(sql: "select * from \(UserViewModel.USER_TABLENAME)")
     }
     fileprivate func reloadSqlData(sql:String) {
-       
+       arrData.removeAll()
         if let arr = UserViewModel.getAllDataUseSql(sql: sql) {
-            arrData.removeAll()
+            
             arrData += arr
         }
         
