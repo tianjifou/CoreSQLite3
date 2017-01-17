@@ -131,7 +131,7 @@ class UserViewModel: NSObject {
        
         var whereParam: [String:AnyObject] = Dictionary()
         whereParam.updateValue(model.name as AnyObject, forKey: "name")
-        whereParam.updateValue(model.imageData as AnyObject, forKey: "imageData")
+//        whereParam.updateValue(model.imageData as AnyObject, forKey: "imageData")
         var result = false
         if !USER_SQL_TYPE {
              result = SQLiteTable.shared.deleteTable(tableName: USER_TABLENAME, andWhereParam: whereParam)

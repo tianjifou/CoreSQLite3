@@ -21,6 +21,8 @@ class TestTableViewCell: UITableViewCell {
     func setCell(model:UserModel) {
         if let data = model.imageData {
               authorImage.image = UIImage.init(data: data)
+        }else {
+            authorImage.image = nil
         }
       nameLabel.text = "姓名： \(model.name)"
       ageLabel.text  = "年龄：  \(model.age)"
