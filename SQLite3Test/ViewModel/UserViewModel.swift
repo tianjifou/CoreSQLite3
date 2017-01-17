@@ -14,11 +14,8 @@ class UserViewModel: NSObject {
    static let USER_SQL_VERSION_CODE = "1.0.0"//上个版本需要清空数据库的版本号
    static let USER_SQL_UPDATE = "USER_SQL_UPDATE"//升级本地数据库版本名
    static let USER_SQL_UPDATE_CODE = "1.0.1"//上个版本需要改变数据库的表的字段
-    /**
-     创建表
-     
-     - returns: 是否成功
-     */
+    static let USER_SQL_TYPE = true //表中是否含有特殊类型（如Data类型）
+  ///创建数据库
   @discardableResult  static func createTable() -> Bool {
         let defaults = UserDefaults.standard
         let version = defaults.value(forKey: USER_SQL_VERSION)
@@ -49,18 +46,11 @@ class UserViewModel: NSObject {
       return result
     }
     
-    /**
-     插入一条数据
-     
-     - parameter model: model
-     
-     - returns: 是否成功
-     */
+    ///插入一条数据
    @discardableResult static func insertOrUpdateTable(_ model:UserModel) -> Bool {
         var dic: [String:AnyObject] = Dictionary()
         var whereParam: [String:AnyObject] = Dictionary()
             dic.updateValue(model.name as AnyObject, forKey: "name")
-//            whereParam.updateValue(model.name as AnyObject, forKey: "name")
             dic.updateValue(model.age as AnyObject, forKey: "age")
         
           if  let value =  model.imageData  {
@@ -75,31 +65,30 @@ class UserViewModel: NSObject {
     
         
         var result = false
-//        if UserViewModel.getOneData(model.createTime)  {
-//            result = SQLiteTable.shared.updateTable(tableName: USER_TABLENAME, andColoumValue: dic, andWhereParam: whereParam)
-//        }else{
-//            result = SQLiteTable.shared.insertTable(tableName: USER_TABLENAME, andColoumValue: dic)
-//        }
-//        return result
-    if UserViewModel.getOneData(model.createTime){
-        result = SQLiteTable.shared.updateTableSql(tableName: USER_TABLENAME, andColoumValue: dic, andWhereParam: whereParam)
-        return result
-    }else {
-        result = SQLiteTable.shared.insertTableSql(tableName: USER_TABLENAME, andColoumValue: dic)
-        return result
+    if !USER_SQL_TYPE {
+        if UserViewModel.getOneData(model.createTime)  {
+            result = SQLiteTable.shared.updateTable(tableName: USER_TABLENAME, andColoumValue: dic, andWhereParam: whereParam)
+        }else{
+            result = SQLiteTable.shared.insertTable(tableName: USER_TABLENAME, andColoumValue: dic)
+        }
+       
+
+    }else{
+        if UserViewModel.getOneData(model.createTime){
+            result = SQLiteTable.shared.updateTableSql(tableName: USER_TABLENAME, andColoumValue: dic, andWhereParam: whereParam)
+           
+        }else {
+            result = SQLiteTable.shared.insertTableSql(tableName: USER_TABLENAME, andColoumValue: dic)
+           
+        }
     }
     
+     return result
     }
     
     
     
-    /**
-     通过createTime获得一条数据是否成功
-     
-     - parameter createTime:条件
-     
-     - returns: 结果
-     */
+    ///获取一条数据
    @discardableResult static func getOneData(_ createTime:Double) -> Bool {
         let sql = "select * from \(USER_TABLENAME) where createTime like \(createTime)"
         if let arr = UserViewModel.getAllDataUseSql(sql: sql) ,  arr.count > 0 {
@@ -107,7 +96,7 @@ class UserViewModel: NSObject {
         }
         return false
     }
-    
+    ///查询数据库
     @discardableResult static func getAllDataUseSql(sql: String) -> [UserModel]? {
         if let arr = SQLiteTable.shared.querySql(sql: sql) ,  arr.count > 0 {
             var arrModel: [UserModel] = []
@@ -137,16 +126,19 @@ class UserViewModel: NSObject {
         }
        return nil
     }
-    
+    ///删除数据
     @discardableResult static func delectData(_ model:UserModel) ->Bool {
        
         var whereParam: [String:AnyObject] = Dictionary()
         whereParam.updateValue(model.name as AnyObject, forKey: "name")
         whereParam.updateValue(model.imageData as AnyObject, forKey: "imageData")
-        
-//        let result = SQLiteTable.shared.deleteTable(tableName: USER_TABLENAME, andWhereParam: whereParam)
-         let result = SQLiteTable.shared.deleteTableSql(tableName: USER_TABLENAME, andWhereParam: whereParam)
-        
+        var result = false
+        if !USER_SQL_TYPE {
+             result = SQLiteTable.shared.deleteTable(tableName: USER_TABLENAME, andWhereParam: whereParam)
+        }else {
+            result = SQLiteTable.shared.deleteTableSql(tableName: USER_TABLENAME, andWhereParam: whereParam)
+        }
+    
        return result
         
     }
