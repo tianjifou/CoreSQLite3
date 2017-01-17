@@ -24,13 +24,10 @@ class SQLiteTable: NSObject {
         self.openDB()
        
     }
-    
-    
-    /**
-     打开数据库
-     
-     - returns: 是否成功
-     */
+   
+ /// 打开数据库
+ ///
+ /// - Returns: 是否成功
  @discardableResult   private func openDB() -> Bool{
         
         let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] + "/\(DB_NAME)"
@@ -51,13 +48,11 @@ class SQLiteTable: NSObject {
         
         return true
     }
-    /**
-     执行数据库操作
-     
-     - parameter sql: 条件
-     
-     - returns: 是否成功
-     */
+  
+  /// 执行数据库操作(不能解析data等类型的属性)
+  ///
+  /// - Parameter sql:  条件
+  /// - Returns:  是否成功
   @discardableResult public  func execSql(sql:String)->Bool {
         
         objc_sync_enter(self)
@@ -80,13 +75,11 @@ class SQLiteTable: NSObject {
         objc_sync_exit(self)
         return true
     }
-    /**
-     查询数据库
-     
-     - parameter sql: 条件
-     
-     - returns: 查询结果
-     */
+   
+    /// 查询数据库
+    ///
+    /// - Parameter sql: 条件
+    /// - Returns: 查询结果
     public  func querySql(sql:String) -> [[String:Any]]? {
         objc_sync_enter(self)
         if  !self.openDB() {
@@ -138,11 +131,10 @@ class SQLiteTable: NSObject {
         }
         
     }
-    /**
-     引入事务操作
-     
-     - parameter exec: 事务回调
-     */
+    
+    /// 引入事务操作
+    ///
+    /// - Parameter exec: 事务回调
     public func doTransaction(exec: ((_ db:OpaquePointer)->())?) {
         objc_sync_enter(self)
         if  !self.openDB() {
@@ -162,10 +154,16 @@ class SQLiteTable: NSObject {
         objc_sync_exit(self)
     }
     /**
-     插入数据的语句操作
+     另一种执行数据库的操作
      
-     - parameter exec: 受影响的行数
+     - parameter sql: 受影响的行数
      */
+   /// 执行数据库的操作（主要解析表中带有data类型字段）
+   ///
+   /// - Parameters:
+   ///   - sql: 条件
+   ///   - params:  条件对应的value值
+   /// - Returns: 条件影响的行数
    public func alltypeExecute(sql:String, params:[Any]?)->CInt {
          objc_sync_enter(self)
           var result:CInt = 0
@@ -176,6 +174,12 @@ class SQLiteTable: NSObject {
         return result
     }
     
+    /// 判断操作数据库的方式
+    ///
+    /// - Parameters:
+    ///   - stmt: 含有解析过sql条件的结构体
+    ///   - sql: 原始条件
+    /// - Returns: 所操作的好书
     private func executeStepSql(stmt:OpaquePointer, sql:String)->CInt {
       
         var result = sqlite3_step(stmt)
@@ -203,7 +207,13 @@ class SQLiteTable: NSObject {
         sqlite3_finalize(stmt)
         return result
     }
-   
+  
+    /// 将sql中的数据类型解析
+    ///
+    /// - Parameters:
+    ///   - sql: 条件
+    ///   - params: 条件对应的value值
+    /// - Returns: 解析结果绑定的结构体
     private func bindSqlType(sql:String, params:[Any]?) -> OpaquePointer? {
         
         if  !self.openDB() {
@@ -256,17 +266,14 @@ class SQLiteTable: NSObject {
     }
   
 }
-
+///不支持data类型的数据相关数据库操作
 extension SQLiteTable {
-   
-    /**
-     创建一张表
-     
-     - parameter tableName: 表名
-     - parameter data:      数据字段
-     
-     - returns: 是否成功
-     */
+    ///  创建一张表
+    ///
+    /// - Parameters:
+    ///   - tableName:  表名
+    ///   - data: 数据字段
+    /// - Returns: 是否成功
     public func createTable(tableName:String, andColoumName data:[String:String]) -> Bool {
         if data.count == 0 {
             return false
@@ -285,6 +292,13 @@ extension SQLiteTable {
         return self.execSql(sql: sql)
     }
     
+    /// 创建一张表
+    ///
+    /// - Parameters:
+    ///   - tableName: 表名
+    ///   - data: 数据字段
+    ///   - dataArray: 添加索引的字段
+    /// - Returns: 是否成功
     public func createTable(tableName:String, andColoumName data:[String:String] ,andAddIndex dataArray:[String]) -> Bool {
         let result = self.createTable(tableName: tableName, andColoumName: data)
         dataArray.forEach { (str) in
@@ -297,13 +311,11 @@ extension SQLiteTable {
     
     
     
-    /**
-     删除一张表
-     
-     - parameter tableName: 表名
-     
-     - returns: 是否成功
-     */
+    
+  ///   删除一张表
+  ///
+  /// - Parameter tableName:  表名
+  /// - Returns: 是否成功
   @discardableResult  public func dropTable(tableName:String) -> Bool {
         
         let sql = "DROP TABLE IF EXISTS \'\(tableName)\' "
@@ -313,20 +325,18 @@ extension SQLiteTable {
         
     }
     
-    /**
-     删除数据
-     
-     - parameter tableName: 表名
-     - parameter whereData: 条件
-     
-     - returns: 是否成功
-     */
+    /// 根据条件删除数据
+    ///
+    /// - Parameters:
+    ///   - tableName: 表名
+    ///   - whereData: 条件
+    /// - Returns: 是否成功
     public func deleteTable(tableName:String,andWhereParam whereData:[String:Any]) -> Bool {
         var sql = "DELETE FROM \'\(tableName)\' "
         if whereData.count > 0 {
             sql += " where "
             whereData.keys.forEach({ (key) in
-                sql += " \(key) = "
+                sql += " \'\(key)\' = "
                 if  let value = whereData[key] as? String  {
                     sql += " \'\(value)\' and"
                 }else {
@@ -339,14 +349,12 @@ extension SQLiteTable {
         
         return self.execSql(sql: sql)
     }
-    /**
-     插入一条数据
-     
-     - parameter tableName: 表名
-     - parameter data:      数据字段
-     
-     - returns: 是否成功
-     */
+    /// 插入数据
+    ///
+    /// - Parameters:
+    ///   - tableName: 表名
+    ///   - data: 所插入的数据
+    /// - Returns: 是否成功
     public func insertTable(tableName:String,andColoumValue data:[String:Any]) -> Bool {
         if data.count == 0 {
             return false
@@ -372,15 +380,13 @@ extension SQLiteTable {
     
    
        
-    /**
-     更新数据
-     
-     - parameter tableName: 表名
-     - parameter data:      数据
-     - parameter whereData: 条件
-     
-     - returns: 是否成功
-     */
+    /// 根据条件更新数据
+    ///
+    /// - Parameters:
+    ///   - tableName: 表名
+    ///   - data:   更新的数据
+    ///   - whereData: 条件
+    /// - Returns: 是否成功
     public func updateTable(tableName:String,andColoumValue data:[String:Any],andWhereParam whereData:[String:Any]) -> Bool {
         if data.count == 0 {
             return false
@@ -388,7 +394,7 @@ extension SQLiteTable {
         var sql = "UPDATE \'\(tableName)\' SET "
         
         data.keys.forEach({ (key) in
-            sql += "\(key) = "
+            sql += "\'\(key)\' = "
             if  let value = data[key] as? String  {
                 sql += "\'\(value)\' ,"
             }else {
@@ -400,7 +406,7 @@ extension SQLiteTable {
         if whereData.count > 0 {
             sql += " where "
             whereData.keys.forEach({ (key) in
-                sql += " \(key) = "
+                sql += " \'\(key)\' = "
                 if  let value = whereData[key] as? String  {
                     sql += " \'\(value)\' and"
                 }else {
@@ -414,7 +420,14 @@ extension SQLiteTable {
     }
 }
 
+// MARK: - 支持data数据的相关操作
 extension SQLiteTable {
+    /// 插入数据
+    ///
+    /// - Parameters:
+    ///   - tableName: 表名
+    ///   - data: 所插入的数据
+    /// - Returns: 是否成功
     public func insertTableSql(tableName:String,andColoumValue data:[String:Any]) -> Bool{
         
         var sql = "INSERT INTO \'\(tableName)\' "
@@ -440,6 +453,13 @@ extension SQLiteTable {
         
         return false
     }
+    /// 根据条件更新数据
+    ///
+    /// - Parameters:
+    ///   - tableName: 表名
+    ///   - data:   更新的数据
+    ///   - whereData: 条件
+    /// - Returns: 是否成功
     public func updateTableSql(tableName:String,andColoumValue data:[String:Any],andWhereParam whereData:[String:Any]) -> Bool {
         if data.count == 0 {
             return false
@@ -447,7 +467,7 @@ extension SQLiteTable {
         var sql = "UPDATE \'\(tableName)\' SET "
         var arr: [Any] = []
         data.keys.forEach({ (key) in
-            sql += "\(key) = ? ,"
+            sql += "\'\(key)\' = ? ,"
             
             if  let va = data[key] {
                 arr.append(va)
@@ -475,12 +495,18 @@ extension SQLiteTable {
         return false
     }
     
+    /// 根据条件删除数据
+    ///
+    /// - Parameters:
+    ///   - tableName: 表名
+    ///   - whereData: 条件
+    /// - Returns: 是否成功
     public func deleteTableSql(tableName:String,andWhereParam whereData:[String:Any]) -> Bool{
         var sql = "DELETE FROM \'\(tableName)\' "
         if whereData.count > 0 {
             sql += " where "
             whereData.keys.forEach({ (key) in
-                sql += " \(key) = "
+                sql += " \'\(key)\' = "
                 if  let value = whereData[key] as? String  {
                     sql += " \'\(value)\' and"
                 }else {
