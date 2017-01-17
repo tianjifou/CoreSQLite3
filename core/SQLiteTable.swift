@@ -394,7 +394,7 @@ extension SQLiteTable {
         var sql = "UPDATE \'\(tableName)\' SET "
         
         data.keys.forEach({ (key) in
-            sql += "\'\(key)\' = "
+            sql += "\(key) = "
             if  let value = data[key] as? String  {
                 sql += "\'\(value)\' ,"
             }else {
@@ -435,7 +435,7 @@ extension SQLiteTable {
         var value = ""
         var arr: [Any] = []
         data.keys.forEach({ (key) in
-            column += "\'\(key)\' ,"
+            column += "\(key) ,"
             value += "?, "
             if  let va = data[key] {
                 arr.append(va)
@@ -467,7 +467,7 @@ extension SQLiteTable {
         var sql = "UPDATE \'\(tableName)\' SET "
         var arr: [Any] = []
         data.keys.forEach({ (key) in
-            sql += "\'\(key)\' = ? ,"
+            sql += "\(key) = ? ,"
             
             if  let va = data[key] {
                 arr.append(va)
@@ -506,7 +506,7 @@ extension SQLiteTable {
         if whereData.count > 0 {
             sql += " where "
             whereData.keys.forEach({ (key) in
-                sql += " \'\(key)\' = "
+                sql += " \(key) = "
                 if  let value = whereData[key] as? String  {
                     sql += " \'\(value)\' and"
                 }else {
