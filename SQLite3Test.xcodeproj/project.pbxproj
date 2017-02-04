@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		454441FCC99C2D55778FB62A /* Pods_SQLite3Test.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E70F8CF06ECC47D993EE2B6 /* Pods_SQLite3Test.framework */; };
 		AD5053A91E27217600CB5E55 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD5053A81E27217600CB5E55 /* AppDelegate.swift */; };
 		AD5053AB1E27217600CB5E55 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD5053AA1E27217600CB5E55 /* ViewController.swift */; };
 		AD5053AE1E27217600CB5E55 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AD5053AC1E27217600CB5E55 /* Main.storyboard */; };
@@ -42,6 +43,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		7E70F8CF06ECC47D993EE2B6 /* Pods_SQLite3Test.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SQLite3Test.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9343B2DE03ED8D5DDF02C140 /* Pods-SQLite3Test.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SQLite3Test.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SQLite3Test/Pods-SQLite3Test.debug.xcconfig"; sourceTree = "<group>"; };
 		AD5053A51E27217600CB5E55 /* SQLite3Test.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SQLite3Test.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AD5053A81E27217600CB5E55 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		AD5053AA1E27217600CB5E55 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -64,6 +67,7 @@
 		AD5053E81E278E3300CB5E55 /* TestTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestTableViewCell.swift; sourceTree = "<group>"; };
 		AD5053E91E278E3300CB5E55 /* TestTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TestTableViewCell.xib; sourceTree = "<group>"; };
 		AD5053EC1E286C6800CB5E55 /* SettingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingViewController.swift; sourceTree = "<group>"; };
+		D796B3A92A36D491C9F2202C /* Pods-SQLite3Test.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SQLite3Test.release.xcconfig"; path = "Pods/Target Support Files/Pods-SQLite3Test/Pods-SQLite3Test.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +77,7 @@
 			files = (
 				AD5053E11E272F6500CB5E55 /* libsqlite3.tbd in Frameworks */,
 				AD5053DF1E272F5600CB5E55 /* libsqlite3.0.tbd in Frameworks */,
+				454441FCC99C2D55778FB62A /* Pods_SQLite3Test.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -93,6 +98,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		914FD7DD06405DF4A096E4BB /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				9343B2DE03ED8D5DDF02C140 /* Pods-SQLite3Test.debug.xcconfig */,
+				D796B3A92A36D491C9F2202C /* Pods-SQLite3Test.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 		AD50539C1E27217600CB5E55 = {
 			isa = PBXGroup;
 			children = (
@@ -102,6 +116,7 @@
 				AD5053C71E27217700CB5E55 /* SQLite3TestUITests */,
 				AD5053A61E27217600CB5E55 /* Products */,
 				AD5053DD1E272F5600CB5E55 /* Frameworks */,
+				914FD7DD06405DF4A096E4BB /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -165,6 +180,7 @@
 			children = (
 				AD5053E01E272F6500CB5E55 /* libsqlite3.tbd */,
 				AD5053DE1E272F5600CB5E55 /* libsqlite3.0.tbd */,
+				7E70F8CF06ECC47D993EE2B6 /* Pods_SQLite3Test.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -192,9 +208,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = AD5053CD1E27217700CB5E55 /* Build configuration list for PBXNativeTarget "SQLite3Test" */;
 			buildPhases = (
+				1C0B1DE32D1EC181023461CF /* [CP] Check Pods Manifest.lock */,
 				AD5053A11E27217600CB5E55 /* Sources */,
 				AD5053A21E27217600CB5E55 /* Frameworks */,
 				AD5053A31E27217600CB5E55 /* Resources */,
+				DE0F088CD9C25A4CF68E1423 /* [CP] Embed Pods Frameworks */,
+				DB714D208DBD51D401FCA45D /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -318,6 +337,54 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		1C0B1DE32D1EC181023461CF /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		DB714D208DBD51D401FCA45D /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-SQLite3Test/Pods-SQLite3Test-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		DE0F088CD9C25A4CF68E1423 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-SQLite3Test/Pods-SQLite3Test-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		AD5053A11E27217600CB5E55 /* Sources */ = {
@@ -480,6 +547,7 @@
 		};
 		AD5053CE1E27217700CB5E55 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9343B2DE03ED8D5DDF02C140 /* Pods-SQLite3Test.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -496,6 +564,7 @@
 		};
 		AD5053CF1E27217700CB5E55 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D796B3A92A36D491C9F2202C /* Pods-SQLite3Test.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -586,6 +655,7 @@
 				AD5053CF1E27217700CB5E55 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		AD5053D01E27217700CB5E55 /* Build configuration list for PBXNativeTarget "SQLite3TestTests" */ = {
 			isa = XCConfigurationList;
@@ -594,6 +664,7 @@
 				AD5053D21E27217700CB5E55 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		AD5053D31E27217700CB5E55 /* Build configuration list for PBXNativeTarget "SQLite3TestUITests" */ = {
 			isa = XCConfigurationList;
@@ -602,6 +673,7 @@
 				AD5053D51E27217700CB5E55 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

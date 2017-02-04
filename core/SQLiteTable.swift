@@ -7,8 +7,9 @@
 //
 
 import UIKit
-
+import SQLCipher
 let DB_NAME = "tianjifou.sqlite"
+let SAFE_KEY = "tianjifou"
 let SQLITE_TEXT_TYPE = "TEXT"
 let SQLITE_INT_TYPE = "INTEGER"
 let SQLITE_DOUBLE_TYPE = "DOUBLE"
@@ -36,7 +37,9 @@ class SQLiteTable: NSObject {
             sqlite3_close(db)
             db = nil
             return false
-        }
+        }else {
+            sqlite3_key(db, SAFE_KEY.cString(using: String.Encoding.utf8), Int32(SAFE_KEY.characters.count))
+    }
         sqlite3_busy_handler(db, { (ptr,count) in
             
             usleep(500000)//如果获取不到锁，表示数据库繁忙，等待0.5秒
@@ -142,11 +145,11 @@ class SQLiteTable: NSObject {
             return
         }
          if exec != nil {
-            if sqlite3_exec(db, "BEGIN", nil, nil, nil) == SQLITE_OK {
+            if sqlite3_exec(db, "BEGIN TRANSACTION", nil, nil, nil) == SQLITE_OK {
                 exec!(db!)
             }
             
-            if sqlite3_exec(db, "COMMIT", nil, nil, nil) == SQLITE_OK {
+            if sqlite3_exec(db, "COMMIT TRANSACTION", nil, nil, nil) == SQLITE_OK {
                 print("提交事务成功")
             }
         }
@@ -523,4 +526,10 @@ extension SQLiteTable {
         return false
     }
 }
-
+extension String {
+    
+    func searchSql() -> String {
+        let str1 = self.replacingOccurrences(of: "'", with: "''")
+        return str1
+    }
+}

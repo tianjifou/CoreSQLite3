@@ -130,7 +130,8 @@ class UserViewModel: NSObject {
     @discardableResult static func delectData(_ model:UserModel) ->Bool {
        
         var whereParam: [String:AnyObject] = Dictionary()
-        whereParam.updateValue(model.createTime as AnyObject, forKey: "createTime")
+        whereParam.updateValue(model.name.searchSql() as AnyObject, forKey: "name")
+//        whereParam.updateValue(model.imageData as AnyObject, forKey: "imageData")
         var result = false
         if !USER_SQL_TYPE {
              result = SQLiteTable.shared.deleteTable(tableName: USER_TABLENAME, andWhereParam: whereParam)
