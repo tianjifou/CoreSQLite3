@@ -18,28 +18,29 @@ let SQLITE_BLOB_TYPE = "BLOB"
 class SQLiteTable: NSObject {
     var  db: OpaquePointer? = nil
     static let  shared = SQLiteTable()
-    private var queue: DispatchQueue!
+   
     override init() {
         super.init()
         
         self.openDB()
-       
+        
     }
    
  /// 打开数据库
  ///
  /// - Returns: 是否成功
  @discardableResult   private func openDB() -> Bool{
-        
+    
+    if db == nil {
         let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] + "/\(DB_NAME)"
         print(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0])
         if sqlite3_open(path.cString(using: String.Encoding.utf8)!,&db) != SQLITE_OK {
-            sqlite3_close(db)
-            db = nil
+            closeDb()
             return false
         }else {
+            //对数据库进行加密
             sqlite3_key(db, SAFE_KEY.cString(using: String.Encoding.utf8), Int32(SAFE_KEY.characters.count))
-    }
+        }
         sqlite3_busy_handler(db, { (ptr,count) in
             
             usleep(500000)//如果获取不到锁，表示数据库繁忙，等待0.5秒
@@ -47,9 +48,15 @@ class SQLiteTable: NSObject {
             return 1   //回调函数返回值为1，则将不断尝试操作数据库。
             
         }, &db)
+    }
         
         
         return true
+    }
+    
+    func closeDb() {
+        sqlite3_close(db)
+        db = nil
     }
   
   /// 执行数据库操作(不能解析data等类型的属性)
@@ -68,13 +75,10 @@ class SQLiteTable: NSObject {
             if let error = String(validatingUTF8:sqlite3_errmsg(db)) {
                print("execute failed to execute  Error: \(error)")
             }
-            sqlite3_close(db)
-            
-            db = nil
             objc_sync_exit(self)
             return false
         }
-        
+
         objc_sync_exit(self)
         return true
     }
@@ -125,7 +129,7 @@ class SQLiteTable: NSObject {
             }
         }
         sqlite3_finalize(statement)
-        sqlite3_close(db)
+
         objc_sync_exit(self)
         if arr.count == 0 {
             return nil
@@ -144,16 +148,30 @@ class SQLiteTable: NSObject {
             objc_sync_exit(self)
             return
         }
-         if exec != nil {
-            if sqlite3_exec(db, "BEGIN TRANSACTION", nil, nil, nil) == SQLITE_OK {
+        if exec != nil {
+             var err: UnsafeMutablePointer<Int8>? = nil
+            if sqlite3_exec(db, "BEGIN TRANSACTION", nil, nil, &err) == SQLITE_OK {
                 exec!(db!)
+                if sqlite3_exec(db, "COMMIT TRANSACTION", nil, nil, &err) == SQLITE_OK {
+                    print("提交事务成功")
+                }else {
+                    print("提交事务失败原因\(err)")
+                    if let error = String(validatingUTF8:sqlite3_errmsg(db)) {
+                        print("execute failed to execute  Error: \(error)")
+                    }
+                    if sqlite3_exec(db, "ROLLBACK TRANSACTION", nil, nil, &err) == SQLITE_OK {
+                        print("回滚事务成功")
+                    }
+                }
+            }else {
+                if sqlite3_exec(db, "ROLLBACK TRANSACTION", nil, nil, &err) == SQLITE_OK {
+                    print("回滚事务成功")
+                }
             }
-            
-            if sqlite3_exec(db, "COMMIT TRANSACTION", nil, nil, nil) == SQLITE_OK {
-                print("提交事务成功")
-            }
+           sqlite3_free(err)
+           
         }
-        sqlite3_close(db)
+
         objc_sync_exit(self)
     }
     /**
@@ -173,6 +191,7 @@ class SQLiteTable: NSObject {
           if let stmt = self.bindSqlType(sql:sql, params:params) {
                 result = self.executeStepSql(stmt:stmt, sql:sql)
             }
+
          objc_sync_exit(self)
         return result
     }
@@ -267,7 +286,10 @@ class SQLiteTable: NSObject {
         }
         return stmt
     }
-  
+    
+    deinit {
+        closeDb()
+    }
 }
 ///不支持data类型的数据相关数据库操作
 extension SQLiteTable {
@@ -339,7 +361,7 @@ extension SQLiteTable {
         if whereData.count > 0 {
             sql += " where "
             whereData.keys.forEach({ (key) in
-                sql += " \'\(key)\' = "
+                sql += " \(key) = "
                 if  let value = whereData[key] as? String  {
                     sql += " \'\(value)\' and"
                 }else {
@@ -409,7 +431,7 @@ extension SQLiteTable {
         if whereData.count > 0 {
             sql += " where "
             whereData.keys.forEach({ (key) in
-                sql += " \'\(key)\' = "
+                sql += " \(key) = "
                 if  let value = whereData[key] as? String  {
                     sql += " \'\(value)\' and"
                 }else {

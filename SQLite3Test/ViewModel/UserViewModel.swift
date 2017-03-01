@@ -14,7 +14,7 @@ class UserViewModel: NSObject {
    static let USER_SQL_VERSION_CODE = "1.0.0"//上个版本需要清空数据库的版本号
    static let USER_SQL_UPDATE = "USER_SQL_UPDATE"//升级本地数据库版本名
    static let USER_SQL_UPDATE_CODE = "1.0.1"//上个版本需要改变数据库的表的字段
-    static let USER_SQL_TYPE = true //表中是否含有特殊类型（如Data类型）
+   static let USER_SQL_TYPE = true //表中是否含有特殊类型（如Data类型）
   ///创建数据库
   @discardableResult  static func createTable() -> Bool {
         let defaults = UserDefaults.standard
@@ -24,7 +24,15 @@ class UserViewModel: NSObject {
             if let update = update as? String{
                 if  let intUpdate = Int(update.replacingOccurrences(of: ".", with: "")) {
                     if intUpdate > 100 {
-                         SQLiteTable.shared.execSql(sql: "ALTER TABLE \(USER_TABLENAME) ADD COLUMN \("id") INTEGER DEFAULT 0")
+                        
+                        if let _ = SQLiteTable.shared.querySql(sql: "select id from \(USER_TABLENAME)"){
+                            
+                        } else {
+                             SQLiteTable.shared.execSql(sql: "ALTER TABLE \(USER_TABLENAME)  ADD COLUMN  \("id") INTEGER DEFAULT 0 IF NOT EXISTS")
+                
+                        }
+                        
+                        
                     }
                 }
                
@@ -66,8 +74,9 @@ class UserViewModel: NSObject {
         
         var result = false
     if !USER_SQL_TYPE {
-        if UserViewModel.getOneData(model.createTime)  {
+        if UserViewModel.getOneDataWithAge(model.age)  {
             result = SQLiteTable.shared.updateTable(tableName: USER_TABLENAME, andColoumValue: dic, andWhereParam: whereParam)
+          
         }else{
             result = SQLiteTable.shared.insertTable(tableName: USER_TABLENAME, andColoumValue: dic)
         }
@@ -76,7 +85,7 @@ class UserViewModel: NSObject {
     }else{
         if UserViewModel.getOneData(model.createTime){
             result = SQLiteTable.shared.updateTableSql(tableName: USER_TABLENAME, andColoumValue: dic, andWhereParam: whereParam)
-           
+            
         }else {
             result = SQLiteTable.shared.insertTableSql(tableName: USER_TABLENAME, andColoumValue: dic)
            
@@ -90,7 +99,18 @@ class UserViewModel: NSObject {
     
     ///获取一条数据
    @discardableResult static func getOneData(_ createTime:Double) -> Bool {
+    
         let sql = "select * from \(USER_TABLENAME) where createTime like \(createTime)"
+        if let arr = UserViewModel.getAllDataUseSql(sql: sql) ,  arr.count > 0 {
+            return true
+        }
+        return false
+    }
+    
+    ///获取一条数据
+    @discardableResult static func getOneDataWithAge(_ age:Int) -> Bool {
+        
+        let sql = "select * from \(USER_TABLENAME) where age == \(age)"
         if let arr = UserViewModel.getAllDataUseSql(sql: sql) ,  arr.count > 0 {
             return true
         }
@@ -127,6 +147,7 @@ class UserViewModel: NSObject {
        return nil
     }
     ///删除数据
+    
     @discardableResult static func delectData(_ model:UserModel) ->Bool {
        
         var whereParam: [String:AnyObject] = Dictionary()

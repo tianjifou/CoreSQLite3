@@ -14,7 +14,7 @@ class SettingViewController: UIViewController {
     @IBOutlet weak var ageTextField: UITextField!
     
     var model: UserModel?
-    
+    fileprivate var test: Bool = false
     override func viewDidLoad() {
         super.viewDidLoad()
         if let model = self.model {
@@ -45,34 +45,78 @@ class SettingViewController: UIViewController {
            saveSql(_model: model)
             
         }else {
-            let model = UserModel()
-            model.name = nameTextField.text ?? "default"
-            if let age = ageTextField.text ,Int(age) != nil{
-                model.age = Int(age)!
+            
+         createOneData()
+           
+        }
+    }
+    
+    ///生成一组数据
+    private func createOneData() {
+        let model = UserModel()
+        model.name = self.nameTextField.text ?? "default"
+        if let age = self.ageTextField.text ,Int(age) != nil{
+            model.age = Int(age)!
+        }
+        if let image = self.authorImage.image {
+            model.imageData = UIImagePNGRepresentation(image)
+        }
+        let nowDate = Date().timeIntervalSince1970
+        model.createTime = nowDate
+        
+        if let count = UserViewModel.getAllDataUseSql(sql: "select * from \(UserViewModel.USER_TABLENAME)")?.count {
+            model.id = count + 1
+        }else{
+            model.id = 1
+        }
+        
+        self.saveSql(_model: model)
+    }
+    ///测试批量操作数据库时查询 和 写入的优化效果
+    private func createMoreData() {
+        test = true
+        let begin =  mach_absolute_time()
+        SQLiteTable.shared.doTransaction(exec: { (db) in
+        for index in 0..<50000{
+           let model = UserModel()
+            model.name = "\(self.nameTextField.text!)\(index+1)"
+            if let age = self.ageTextField.text ,Int(age) != nil{
+                model.age = Int(age)! + index
             }
-            if let image = authorImage.image {
+            if let image = self.authorImage.image {
                 model.imageData = UIImagePNGRepresentation(image)
             }
             let nowDate = Date().timeIntervalSince1970
-            model.createTime = nowDate
+            model.createTime = nowDate + Double(index)
             
             if let count = UserViewModel.getAllDataUseSql(sql: "select * from \(UserViewModel.USER_TABLENAME)")?.count {
                 model.id = count + 1
             }else{
                 model.id = 1
             }
-            
-            saveSql(_model: model)
+            self.saveSql(_model: model)
+            print("==================\(index)")
         }
+        
+        })
+        let end = mach_absolute_time()
+        let some = Double(end - begin)
+        print("=====过了多长时间\(some*pow(10, -9))")
     }
+    
+    
     private func saveSql(_model:UserModel){
         if UserViewModel.insertOrUpdateTable(_model) {
-            _ = self.navigationController?.popViewController(animated: true)
+            if !test {
+                 _ = self.navigationController?.popViewController(animated: true)
+            }
+           
         }else {
             let alert = UIAlertController.init(title: "", message: "保存失败", preferredStyle: .alert)
             let action = UIAlertAction.init(title: "确认", style: .cancel, handler: nil)
             alert.addAction(action)
             self.present(alert, animated: true, completion: nil)
+            print("-----------------")
         }
     }
     override func didReceiveMemoryWarning() {
