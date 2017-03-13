@@ -19,7 +19,7 @@ class SQLiteTable: NSObject {
     var  db: OpaquePointer? = nil
     static let  shared = SQLiteTable()
    
-    override init() {
+   private override init() {
         super.init()
         
         self.openDB()
