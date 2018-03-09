@@ -39,7 +39,7 @@ class SQLiteTable: NSObject {
             return false
         }else {
             //对数据库进行加密
-            sqlite3_key(db, SAFE_KEY.cString(using: String.Encoding.utf8), Int32(SAFE_KEY.characters.count))
+            sqlite3_key(db, SAFE_KEY.cString(using: String.Encoding.utf8), Int32(SAFE_KEY.count))
         }
         sqlite3_busy_handler(db, { (ptr,count) in
             
@@ -155,7 +155,7 @@ class SQLiteTable: NSObject {
                 if sqlite3_exec(db, "COMMIT TRANSACTION", nil, nil, &err) == SQLITE_OK {
                     print("提交事务成功")
                 }else {
-                    print("提交事务失败原因\(err)")
+                    print("提交事务失败原因\(String(describing: err))")
                     if let error = String(validatingUTF8:sqlite3_errmsg(db)) {
                         print("execute failed to execute  Error: \(error)")
                     }
@@ -260,14 +260,14 @@ class SQLiteTable: NSObject {
                 var result:CInt = 0
                 
                 for index in 1...count {
-                    
-                    if let txt = params[index-1] as? String {
+                    let num = Int(index) - 1
+                    if let txt = params[num] as? String {
                         result = sqlite3_bind_text(stmt, CInt(index), txt, -1, someCharChar)
-                    } else if let data = params[index-1] as? NSData {
+                    } else if let data = params[num] as? NSData {
                         result = sqlite3_bind_blob(stmt, CInt(index), data.bytes, CInt(data.length), someCharChar)
-                    }else if let val = params[index-1] as? Double {
+                    }else if let val = params[num] as? Double {
                         result = sqlite3_bind_double(stmt, CInt(index), CDouble(val))
-                    } else if let val = params[index-1] as? Int {
+                    } else if let val = params[num] as? Int {
                         result = sqlite3_bind_int64(stmt, index, Int64(val))
                     } else {
                         result = sqlite3_bind_null(stmt, CInt(index))
@@ -310,7 +310,7 @@ extension SQLiteTable {
             sql += "\(data[key]!) ,"
             
         }
-        let range = sql.characters.index(sql.endIndex, offsetBy: -1)..<sql.endIndex
+        let range = sql.index(sql.endIndex, offsetBy: -1)..<sql.endIndex
         sql.replaceSubrange(range, with: ")")
         
         print(sql)
@@ -368,7 +368,7 @@ extension SQLiteTable {
                     sql += " \(whereData[key]!) and"
                 }
             })
-            let range = sql.characters.index(sql.endIndex, offsetBy: -3)..<sql.endIndex
+            let range = sql.index(sql.endIndex, offsetBy: -3)..<sql.endIndex
             sql.removeSubrange(range)
         }
         
@@ -395,8 +395,8 @@ extension SQLiteTable {
                 value += "\(data[key]!) ,"
             }
         })
-        let rangeValue = value.characters.index(value.endIndex, offsetBy: -1)..<value.endIndex
-        let rangeColumn = column.characters.index(column.endIndex, offsetBy: -1)..<column.endIndex
+        let rangeValue = value.index(value.endIndex, offsetBy: -1)..<value.endIndex
+        let rangeColumn = column.index(column.endIndex, offsetBy: -1)..<column.endIndex
         value.removeSubrange(rangeValue)
         column.removeSubrange(rangeColumn)
         sql += "(\(column)) VALUES (\(value))"
@@ -426,7 +426,7 @@ extension SQLiteTable {
                 sql += "\(data[key]!) ,"
             }
         })
-        let range = sql.characters.index(sql.endIndex, offsetBy: -1)..<sql.endIndex
+        let range = sql.index(sql.endIndex, offsetBy: -1)..<sql.endIndex
         sql.replaceSubrange(range, with: "")
         if whereData.count > 0 {
             sql += " where "
@@ -438,7 +438,7 @@ extension SQLiteTable {
                     sql += " \(whereData[key]!) and"
                 }
             })
-            let range = sql.characters.index(sql.endIndex, offsetBy: -3)..<sql.endIndex
+            let range = sql.index(sql.endIndex, offsetBy: -3)..<sql.endIndex
             sql.removeSubrange(range)
         }
         return self.execSql(sql: sql)
@@ -467,8 +467,8 @@ extension SQLiteTable {
             }
             
         })
-        let rangeValue = value.characters.index(value.endIndex, offsetBy: -2)..<value.endIndex
-        let rangeColumn = column.characters.index(column.endIndex, offsetBy: -1)..<column.endIndex
+        let rangeValue = value.index(value.endIndex, offsetBy: -2)..<value.endIndex
+        let rangeColumn = column.index(column.endIndex, offsetBy: -1)..<column.endIndex
         value.removeSubrange(rangeValue)
         column.removeSubrange(rangeColumn)
         sql += "(\(column)) VALUES (\(value))"
@@ -498,7 +498,7 @@ extension SQLiteTable {
                 arr.append(va)
             }
         })
-        let range = sql.characters.index(sql.endIndex, offsetBy: -2)..<sql.endIndex
+        let range = sql.index(sql.endIndex, offsetBy: -2)..<sql.endIndex
         sql.replaceSubrange(range, with: "")
         if whereData.count > 0 {
             sql += " where "
@@ -510,7 +510,7 @@ extension SQLiteTable {
                     sql += " \(whereData[key]!) and"
                 }
             })
-            let range = sql.characters.index(sql.endIndex, offsetBy: -3)..<sql.endIndex
+            let range = sql.index(sql.endIndex, offsetBy: -3)..<sql.endIndex
             sql.removeSubrange(range)
         }
         if self.alltypeExecute(sql: sql, params: arr) > 0 {
@@ -538,7 +538,7 @@ extension SQLiteTable {
                     sql += " \(whereData[key]!) and"
                 }
             })
-            let range = sql.characters.index(sql.endIndex, offsetBy: -3)..<sql.endIndex
+            let range = sql.index(sql.endIndex, offsetBy: -3)..<sql.endIndex
             sql.removeSubrange(range)
         }
         if self.alltypeExecute(sql: sql, params: nil) > 0 {
